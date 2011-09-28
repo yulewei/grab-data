@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<script type="text/javascript" src="data.js"></script>
+	</head>
+	<body>
+		<div id="testdiv">
+		</div>
+		<script type="text/javascript">
+			var	div= document.getElementById("testdiv");
+			var str="";
+			for (i in data)
+			{
+				// div.innerText+=data[i].X+" "+data[i].Y+"\n";
+				str=str+ "<p>"+data[i].X+" "+data[i].Y+"</p>";
+			}
+			div.innerHTML=str;
+		</script>
+	</body>
+</html>

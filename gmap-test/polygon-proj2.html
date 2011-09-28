@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<title>Google Maps JavaScript API v3 Example: Polygon Simple</title>
+		<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script src="lib/proj4js-combined.js"></script>
+		<script type="text/javascript" src="data.js"></script>
+		<script>
+			var dataout;
+			function loadData1() {
+				var data = [[30.080262, 120.104252], [30.108292, 120.156465], [30.120262, 120.1374252]];
+				return data;
+			}
+
+			function loadData() {
+				// var data = units[0].features[0].geometry.rings[0];
+
+				// var data = [[30.080262, 120.104252], [30.108292, 120.156465], [30.120262, 120.1374252]];
+
+				Proj4js.defs["EPSG:900913"] = "+title= Google Mercator EPSG:900913 +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs";
+				// Proj4js.defs["EPSG:2431"] = "+proj=tmerc +lat_0=29.53 +lon_0=119.34 +k=1 +x_0=50000 +y_0=0 +ellps=krass +units=m +no_defs";
+				// Proj4js.defs["EPSG:2431"] = "+proj=tmerc +lat_0=30.20 +lon_0=120.12 +k=1 +x_0=75000 +y_0=75000 +ellps=krass +units=m +no_defs";
+				Proj4js.defs["EPSG:2431"] = "+proj=tmerc +lat_0=30.1533 +lon_0=120.0612 +k=1 +x_0=70000 +y_0=70000 +ellps=krass +units=m +no_defs";
+				Proj4js.defs["EPSG:4326"] = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+				// var source = new Proj4js.Proj('EPSG:900913');
+				var source = new Proj4js.Proj('EPSG:2431');
+				var dest = new Proj4js.Proj('EPSG:4326');
+
+				var outarr = [];
+
+				var str = "";
+
+				var features = units.features;
+				for(var k = 0; k < features.length; k++) {
+					var data = features[k].geometry.rings[0];
+					var out = [];
+					for(var i = 0; i < data.length; i++) {
+
+						var p = new Proj4js.Point(data[i][0], data[i][1]);
+
+						// // 2431
+						// p.x = p.x + 2185000;
+						// p.y = p.y + 3410000;
+
+						// // 900913
+						// p.x = p.x + 13296527.41086133614;
+						// p.y = p.y + 3452348.672111976114;
+
+						str = str + p.x + ", " + p.y + " <=> ";
+						Proj4js.transform(source, dest, p);
+
+						// p.x = p.x + 21.948;
+						// p.y = p.y + 29.524;
+						str = str + p.x + ", " + p.y + "</br>";
+						out[i] = [p.y, p.x];
+					}
+					outarr[k] = out;
+				}
+
+				document.getElementById("info").innerHTML = str;
+				return outarr;
+			}
+		</script>
+		<script type="text/javascript">
+			function initialize() {
+				var myLatLng = new google.maps.LatLng(30.23, 120.18);
+				var myOptions = {
+					zoom : 10,
+					center : myLatLng,
+					mapTypeId : google.maps.MapTypeId.ROADMAP
+				};
+
+				var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+				var data = loadData();
+
+				for(var k = 0; k < data.length; k++) {
+					var triangleCoords = [];
+					for(var i = 0; i < data[k].length; i++) {
+						triangleCoords[i] = new google.maps.LatLng(data[k][i][0], data[k][i][1]);
+					}
+					// Construct the polygon
+					var bermudaTriangle = new google.maps.Polygon({
+						paths : triangleCoords,
+						strokeColor : "#FF0000",
+						strokeOpacity : 0.8,
+						strokeWeight : 2,
+						fillColor : "#FF0000",
+						fillOpacity : 0.35
+					});
+
+					bermudaTriangle.setMap(map);
+				}
+			}
+		</script>
+	</head>
+	<body onload="initialize()">
+		<div id="map_canvas" style="width: 800px; height: 600px"></div>
+		<div id="info"></div>
+	</body>
+</html>
